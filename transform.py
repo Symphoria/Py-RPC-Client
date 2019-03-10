@@ -1,7 +1,7 @@
 import ast
-import astor
 import requests
 import json
+import sys
 
 
 class FunctionTransformer(ast.NodeTransformer):
@@ -28,21 +28,26 @@ class FunctionTransformer(ast.NodeTransformer):
         return node
 
 
-filepath = "test.py"
-data = open(filepath).read()
+if __name__ == '__main__':
+    registry_url = "https://rpc-registry-server.herokuapp.com/all-procedures"
 
-registry_url = "https://rpc-registry-server.herokuapp.com/all-procedures"
-print("Getting Remote Procedures...")
-response = requests.get(registry_url)
+    print("Getting Remote Procedures...")
+    response = requests.get(registry_url)
+    remote_procedures = json.loads(response.content)
+    # remote_procedures = ['is_even', 'find_count']
+    print("Remote Procedures Fetched. Running Transformations...")
 
-remote_procedures = json.loads(response.content)
-# remote_procedures = ['is_even', 'find_count']
+    filepath = sys.argv[1]
+    data = open(filepath).read()
 
-tree = ast.parse(data)
-transformer = FunctionTransformer(remote_procedures)
-tree = transformer.visit(tree)
+    tree = ast.parse(data)
+    transformer = FunctionTransformer(remote_procedures)
+    tree = transformer.visit(tree)
 
-ast.fix_missing_locations(tree)
+    ast.fix_missing_locations(tree)
+    print("Transformations Done. Running transformed code...")
 
-with open("out.py", "w") as f:
-    f.write(astor.to_source(tree))
+    exec(compile(tree, filename='<ast>', mode='exec'))
+
+    # with open("out.py", "w") as f:
+    #     f.write(astor.to_source(tree))
