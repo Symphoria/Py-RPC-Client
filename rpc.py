@@ -6,20 +6,16 @@ from serialize import marshal
 from deserialize import unmarshal
 
 
-signature = {
-    'is_even': {
-        'name': 'is_even',
-        'parameters': [{ 'position': 1, 'type': 'int' }],
-        'server': "http://127.0.0.1:5000/remote-call",
-        'returnType': 'boolean'
-    },
-    'find_count': {
-        'name': 'find_count',
-        'parameters': [{'position': 1, 'type': 'string'}, {'position': 2, 'type': 'char'}],
-        'server': "http://127.0.0.1:5000/remote-call",
-        'returnType': 'int'
+registry_url = "http://bbd0dbdf.ngrok.io"
+
+
+def get_signature(proc_name):
+    headers = {
+        "data": json.dumps({"serviceName": proc_name})
     }
-}
+    result = requests.get(registry_url + "/service-provider", headers=headers)
+
+    return json.loads(result.content)
 
 
 def check_arg(arg, type):
@@ -29,26 +25,32 @@ def check_arg(arg, type):
         return isinstance(arg, str)
     elif type == 'char':
         return isinstance(arg, str) and len(arg) == 1
+    elif type == 'float':
+        return isinstance(arg, float)
 
 
 def rpc_call(proc_name, *args):
-    proc_signature = signature[proc_name]
-    proc_parameters = sorted(proc_signature['parameters'], key=lambda x: x['position'])
+    proc_signature = get_signature(proc_name)
+    proc_parameters = sorted(proc_signature['parameters'], key=lambda x: x['parameterPosition'])
     payload = {
-        "proc_name": proc_name,
-        "args": []
+        "serviceName": proc_name,
+        "parameters": []
     }
 
     for i, arg in enumerate(args):
-        if check_arg(arg, proc_parameters[i]['type']):
-            payload["args"].append(marshal(arg, proc_parameters[i]['type']))
+        if check_arg(arg, proc_parameters[i]['parameterType']):
+            param_body = {
+                "parameterPosition": i + 1,
+                "parameterValue": marshal(arg, proc_parameters[i]['parameterType'])
+            }
+            payload["parameters"].append(param_body)
         else:
             sys.exit("ERROR: Value of passed argument does not match type specified in remote procedure signature")
 
     headers = {
         'Content-Type': 'application/json'
     }
-    result = requests.post(proc_signature['server'], data=json.dumps(payload), headers=headers)
+    result = requests.post(proc_signature['serverAddress'], data=json.dumps(payload), headers=headers)
     unmarshalled_result = unmarshal(json.loads(result.content), proc_signature['returnType'])
 
     return unmarshalled_result

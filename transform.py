@@ -31,11 +31,12 @@ class FunctionTransformer(ast.NodeTransformer):
 filepath = "test.py"
 data = open(filepath).read()
 
-# print("Getting Remote Procedures...")
-# response = requests.get("http://127.0.0.1:8000/all-procedures")
+registry_url = "http://bbd0dbdf.ngrok.io/all-procedures"
+print("Getting Remote Procedures...")
+response = requests.get(registry_url)
 
-# remote_procedures = json.loads(response.content)
-remote_procedures = ['is_even', 'find_count']
+remote_procedures = json.loads(response.content)
+# remote_procedures = ['is_even', 'find_count']
 
 tree = ast.parse(data)
 transformer = FunctionTransformer(remote_procedures)

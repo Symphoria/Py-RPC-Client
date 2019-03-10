@@ -12,4 +12,4 @@ def marshal(arg, type):
     if type == 'boolean':
         return marshal_boolean(arg)
 
-    return json.dumps(arg)
+    return arg
