@@ -6,5 +6,3 @@ if is_even(4):
 else:
     print("Oh! Its odd")
 
-s = 'yoohoo'
-print(find_count(s, 'o'))

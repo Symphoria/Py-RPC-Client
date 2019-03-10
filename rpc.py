@@ -6,7 +6,7 @@ from serialize import marshal
 from deserialize import unmarshal
 
 
-registry_url = "http://bbd0dbdf.ngrok.io"
+registry_url = "https://rpc-registry-server.herokuapp.com"
 
 
 def get_signature(proc_name):

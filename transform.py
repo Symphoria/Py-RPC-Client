@@ -31,7 +31,7 @@ class FunctionTransformer(ast.NodeTransformer):
 filepath = "test.py"
 data = open(filepath).read()
 
-registry_url = "http://bbd0dbdf.ngrok.io/all-procedures"
+registry_url = "https://rpc-registry-server.herokuapp.com/all-procedures"
 print("Getting Remote Procedures...")
 response = requests.get(registry_url)
 

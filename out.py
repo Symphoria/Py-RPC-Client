@@ -1,3 +1,5 @@
 from rpc import rpc_call
-
-print(rpc_call('is_even', 1))
+if rpc_call('is_even', 4):
+    print('It is even')
+else:
+    print('Oh! Its odd')
