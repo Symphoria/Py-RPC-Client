@@ -1,7 +1,8 @@
 import ast
 import requests
 import json
-import sys
+import argparse
+import astor
 
 
 class FunctionTransformer(ast.NodeTransformer):
@@ -37,7 +38,13 @@ if __name__ == '__main__':
     # remote_procedures = ['is_even', 'find_count']
     print("Remote Procedures Fetched. Running Transformations...")
 
-    filepath = sys.argv[1]
+    parser = argparse.ArgumentParser("RPC-Transformer")
+    parser.add_argument('filename', type=str, help='Filename to transform')
+    parser.add_argument('--o', nargs=1, help='Write transformed code to output file')
+    parser.add_argument('--norun', action='store_true', help='Does not run the transformed code')
+    args = parser.parse_args()
+
+    filepath = args.filename
     data = open(filepath).read()
 
     tree = ast.parse(data)
@@ -45,9 +52,13 @@ if __name__ == '__main__':
     tree = transformer.visit(tree)
 
     ast.fix_missing_locations(tree)
-    print("Transformations Done. Running transformed code...")
 
-    exec(compile(tree, filename='<ast>', mode='exec'))
+    if args.o:
+        print("Writing Transformed Code to file: ", args.o[0])
+        with open(args.o[0], "w") as f:
+            f.write(astor.to_source(tree))
 
-    # with open("out.py", "w") as f:
-    #     f.write(astor.to_source(tree))
+    if not args.norun:
+        print("Transformations Done. Running transformed code...\n")
+        exec(compile(tree, filename='<ast>', mode='exec'))
+
