@@ -1,6 +1,3 @@
-import json
-
-
 def marshal_boolean(arg):
     if arg:
         return '1'

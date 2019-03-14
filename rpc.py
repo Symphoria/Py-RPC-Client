@@ -37,6 +37,13 @@ def rpc_call(proc_name, *args):
         "parameters": []
     }
 
+    with open('config_vars.txt', 'r+') as f:
+        request_no = int(f.read())
+        payload['request_no'] = request_no
+        f.seek(0)
+        f.write(str(request_no + 1))
+        f.truncate()
+
     for i, arg in enumerate(args):
         if check_arg(arg, proc_parameters[i]['parameterType']):
             param_body = {
