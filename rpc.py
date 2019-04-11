@@ -40,9 +40,6 @@ def rpc_call(proc_name, *args):
     with open('config_vars.txt', 'r+') as f:
         request_no = int(f.read())
         payload['request_no'] = request_no
-        f.seek(0)
-        f.write(str(request_no + 1))
-        f.truncate()
 
     for i, arg in enumerate(args):
         if check_arg(arg, proc_parameters[i]['parameterType']):
@@ -57,7 +54,17 @@ def rpc_call(proc_name, *args):
     headers = {
         'Content-Type': 'application/json'
     }
-    result = requests.post(proc_signature['serverAddress'], data=json.dumps(payload), headers=headers)
+
+    try:
+        result = requests.post(proc_signature['serverAddress'], data=json.dumps(payload), headers=headers)
+    except requests.Timeout as e:
+        return rpc_call(proc_name, *args)
+
+    with open('config_vars.txt', 'r+') as f:
+        f.seek(0)
+        f.write(str(payload['request_no'] + 1))
+        f.truncate()
+
     unmarshalled_result = unmarshal(json.loads(result.content), proc_signature['returnType'])
 
     return unmarshalled_result
