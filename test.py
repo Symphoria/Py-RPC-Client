@@ -9,3 +9,4 @@ else:
 s = 'hello world'
 print(find_count(s, 'l'))
 
+print(find_sum([[False, True, True], [False, False], [True]]))

@@ -35,7 +35,7 @@ if __name__ == '__main__':
     print("Getting Remote Procedures...")
     response = requests.get(registry_url)
     remote_procedures = json.loads(response.content)
-    # remote_procedures = ['is_even', 'find_count']
+    # remote_procedures = ['is_even', 'find_count', 'find_sum']
     print("Remote Procedures Fetched. Running Transformations...")
 
     parser = argparse.ArgumentParser("RPC-Transformer")

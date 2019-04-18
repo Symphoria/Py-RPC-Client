@@ -4,6 +4,7 @@ import requests
 
 from serialize import marshal
 from deserialize import unmarshal
+from check import check_arg
 
 
 registry_url = "https://rpc-registry-server.herokuapp.com"
@@ -16,17 +17,6 @@ def get_signature(proc_name):
     result = requests.get(registry_url + "/service-provider", headers=headers)
 
     return json.loads(result.content)
-
-
-def check_arg(arg, type):
-    if type == 'int':
-        return isinstance(arg, int)
-    elif type == 'string':
-        return isinstance(arg, str)
-    elif type == 'char':
-        return isinstance(arg, str) and len(arg) == 1
-    elif type == 'float':
-        return isinstance(arg, float)
 
 
 def rpc_call(proc_name, *args):
