@@ -30,7 +30,7 @@ class FunctionTransformer(ast.NodeTransformer):
 
 
 if __name__ == '__main__':
-    registry_url = "https://rpc-registry-server.herokuapp.com/all-procedures"
+    registry_url = "https://registry-service-provider.herokuapp.com/all-procedures"
 
     print("Getting Remote Procedures...")
     response = requests.get(registry_url)

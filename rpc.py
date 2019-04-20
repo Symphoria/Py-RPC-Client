@@ -7,7 +7,13 @@ from deserialize import unmarshal
 from check import check_arg
 
 
-registry_url = "https://rpc-registry-server.herokuapp.com"
+registry_url = "https://registry-service-provider.herokuapp.com"
+
+client_ip_request = requests.get('http://myip.dnsomatic.com/')
+client_ip = client_ip_request.content.decode().split(',')
+client_ip = client_ip[0]
+print(client_ip)
+print()
 
 
 def get_signature(proc_name):
@@ -24,12 +30,13 @@ def rpc_call(proc_name, *args):
     proc_parameters = sorted(proc_signature['parameters'], key=lambda x: x['parameterPosition'])
     payload = {
         "serviceName": proc_name,
-        "parameters": []
+        "parameters": [],
+        "clientIp": client_ip
     }
 
     with open('config_vars.txt', 'r+') as f:
         request_no = int(f.read())
-        payload['request_no'] = request_no
+        payload['requestID'] = request_no
 
     for i, arg in enumerate(args):
         if check_arg(arg, proc_parameters[i]['parameterType']):
@@ -52,7 +59,7 @@ def rpc_call(proc_name, *args):
 
     with open('config_vars.txt', 'r+') as f:
         f.seek(0)
-        f.write(str(payload['request_no'] + 1))
+        f.write(str(payload['requestID'] + 1))
         f.truncate()
 
     unmarshalled_result = unmarshal(json.loads(result.content), proc_signature['returnType'])

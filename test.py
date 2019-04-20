@@ -1,12 +1,5 @@
 from rpc import rpc_call
 
 
-if is_even(5):
-    print('It is even')
-else:
-    print("Oh! Its odd")
-
-s = 'hello world'
-print(find_count(s, 'l'))
-
-print(find_sum([[False, True, True], [False, False], [True]]))
+print(add(6, 9))
+print(sub(7, 6))
